@@ -412,3 +412,24 @@ input:focus{border-color:var(--fg);outline:none;box-shadow:inset 0 0 0 1px var(-
 [data-scrub="card"]{transform-origin:50% 0}
 [data-scrub="media"] .win img{transition:none}
 @media (prefers-reduced-motion:reduce){[data-scrub]{opacity:1!important;transform:none!important;clip-path:none!important}[data-scrub] .win{clip-path:none!important}}
+
+/* Safari 26+: parallax as scroll-driven CSS animations (compositor, no JS lag) */
+@supports (animation-timeline: view()) {
+  html.css-par .win[data-speed]{--a:calc(var(--s) * (50vh + 9rem));animation:par-o linear both;animation-timeline:view();animation-range:cover}
+  html.css-par .win.c-photo[data-speed]{animation-name:par-c}
+  html.css-par .win[data-speed]{view-timeline:--w block}
+  html.css-par .win[data-speed] img{animation:par-io linear both;animation-timeline:--w;animation-range:cover}
+  html.css-par .win.c-photo[data-speed] img{animation-name:par-ic}
+  html.css-par .hero-bg img{animation:par-hero linear both;animation-timeline:scroll(root);animation-range:0 100vh}
+  html.css-par .band,html.css-par .final-wrap{view-timeline:--sec block}
+  html.css-par .band-bg img,html.css-par .final-bg img{animation:par-px linear both;animation-timeline:--sec;animation-range:cover}
+  html.css-par .ring{animation:par-spin linear both;animation-timeline:scroll(root)}
+  @keyframes par-c{from{translate:0 var(--a)}to{translate:0 calc(var(--a) * -1)}}
+  @keyframes par-o{from{translate:0 calc(var(--a) * -.4)}to{translate:0 calc(var(--a) * .4)}}
+  @keyframes par-ic{from{translate:0 calc(var(--a) * -.12)}to{translate:0 calc(var(--a) * .12)}}
+  @keyframes par-io{from{translate:0 calc(var(--a) * .3)}to{translate:0 calc(var(--a) * -.3)}}
+  @keyframes par-hero{to{translate:0 calc(.22 * 100vh)}}
+  @keyframes par-px{from{translate:0 calc(-.12 * (50vh + 20rem))}to{translate:0 calc(.12 * (50vh + 20rem))}}
+  @keyframes par-spin{to{rotate:2800deg}}
+}
+@media (prefers-reduced-motion:reduce){html.css-par *{animation:none!important}}

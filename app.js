@@ -7,7 +7,11 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Safari scrolls on the compositor, so JS-driven parallax visibly lags behind the page there; it keeps native scroll and drops continuous parallax (add ?fx=full to compare)
   var isSafari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
-  var lite = isSafari && !/[?&]fx=full/.test(location.search);
+  var fxCss = /[?&]fx=css/.test(location.search);
+  var lite = (isSafari && !/[?&]fx=full/.test(location.search)) || fxCss;
+  // where the browser supports scroll-driven CSS animations (Safari 26+), the parallax runs on the compositor in CSS instead of JS
+  var cssPar = lite && !reduce && !!(window.CSS && CSS.supports && CSS.supports('animation-timeline', 'view()'));
+  if (cssPar) document.documentElement.classList.add('css-par');
   var body = document.body;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -151,7 +155,7 @@
   /* ---------- per-frame scroll effects ---------- */
   var heroEl = $('#hero'), heroImg = $('.hero-bg img'), header = $('#header'), ring = $('#ring');
   var scrubs = $$('[data-scrub]').map(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.hasAttribute('data-scrub'); }); el._i = el.style.getPropertyValue('--i') !== '' ? parseFloat(el.style.getPropertyValue('--i')) : sib.indexOf(el); el._ty = 0; el._t = -1; el._win = el.getAttribute('data-scrub') === 'media' ? el.querySelector('.win') : null; return el; });
-  var wins = $$('[data-speed]'), ghosts = $$('[data-ghost]'), steps = $$('[data-step]'), pxImgs = $$('.band-bg img,.final-bg img');
+  var wins = $$('[data-speed]'), _w = $$('[data-speed]').forEach(function (w) { w.style.setProperty('--s', w.getAttribute('data-speed')); }), ghosts = $$('[data-ghost]'), steps = $$('[data-step]'), pxImgs = $$('.band-bg img,.final-bg img');
   var pxSecs = pxImgs.map(function (im) { return im.closest('section'); });
   var stepSecs = steps.map(function (s) { return s.getAttribute('data-step') === 'card' ? s.closest('section') : null; });
   var lastScroll = 0, heroH = heroEl.offsetHeight, frame = 0;
