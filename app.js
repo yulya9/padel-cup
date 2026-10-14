@@ -159,6 +159,10 @@
   var pxSecs = pxImgs.map(function (im) { return im.closest('section'); });
   var stepSecs = steps.map(function (s) { return s.getAttribute('data-step') === 'card' ? s.closest('section') : null; });
   var lastScroll = 0, heroH = heroEl.offsetHeight, frame = 0;
+  if (cssPar) {
+    scrubs.forEach(function (el) { el.style.setProperty('--i', el._i); });
+    if (scrub) { scrub.style.setProperty('--n', scrubWords.length + 6); scrubWords.forEach(function (w, i) { w.style.setProperty('--k', i); }); }
+  }
   // geometry is read once per frame before any write, and a style is only written when its value changed (cheap in Safari)
   function rect(el) { if (el._f !== frame) { el._r = el.getBoundingClientRect(); el._f = frame; } return el._r; }
   function put(el, prop, v) { var k = '_p' + prop; if (el[k] !== v) { el[k] = v; el.style[prop] = v; } }
@@ -169,7 +173,7 @@
     if (scrub) rect(scrub);
     if (body.classList.contains('ready')) checkReveal();
     var delta = scroll - lastScroll; lastScroll = scroll;
-    mq2(delta);
+    if (!cssPar) mq2(delta);
     // hero parallax
     if (!lite && scroll < heroH * 1.2) put(heroImg, 'translate', '0 ' + (scroll * 0.22).toFixed(1) + 'px');
     // parallax windows: wrapper moves one way, picture inside the other
@@ -186,17 +190,17 @@
       put(im, 'transform', 'translate3d(0,' + ((r.top + r.height / 2 - vh / 2) * -0.12).toFixed(1) + 'px,0)');
     });
     // scrubbed statement
-    if (scrub) {
+    if (scrub && !cssPar) {
       var sr0 = rect(scrub), p0 = clamp((vh * 0.85 - sr0.top) / (vh * 0.55 + sr0.height * 0.4), 0, 1), n = scrubWords.length;
       scrubWords.forEach(function (w, i) { var wp = clamp(p0 * (n + 6) - i, 0, 6) / 6; put(w, 'color', lerpC(wp)); });
     }
     // giant labels slide in from the right: translate3d((1-t)*720px), opacity .15 -> 1
-    ghosts.forEach(function (g) {
+    if (!cssPar) ghosts.forEach(function (g) {
       var top = rect(g).top, t = easeOutCubic(clamp((0.92 * vh - top) / (0.62 * vh), 0, 1));
       put(g, 'transform', 'translate3d(' + ((1 - t) * 720).toFixed(1) + 'px,0,0)'); put(g, 'opacity', (0.15 + 0.85 * t).toFixed(3));
     });
     // scroll-driven cards: process steps stack up one by one, "included" cards rise left to right with a slight scale
-    steps.forEach(function (s, k) {
+    if (!cssPar) steps.forEach(function (s, k) {
       var top = rect(s).top;
       if (s.getAttribute('data-step') === 'card') {
         var i = parseFloat(s.style.getPropertyValue('--i')) || 0, sr = rect(stepSecs[k]);
@@ -210,7 +214,7 @@
       }
     });
     // scrubbed reveals: card = lift + scale, row = wipe from the left, media = lift + photo unmasked from the bottom; siblings enter one after another
-    scrubs.forEach(function (el) {
+    if (!cssPar) scrubs.forEach(function (el) {
       var kind = el.getAttribute('data-scrub'), top = rect(el).top - el._ty;
       var t = reduce ? 1 : Math.round(easeOutCubic(clamp((vh * 0.97 - el._i * vh * 0.05 - top) / (vh * 0.3), 0, 1)) * 1000) / 1000, ty = 0, st = el.style;
       if (t === el._t) return; el._t = t;
