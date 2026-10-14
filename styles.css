@@ -175,8 +175,8 @@ section{position:relative}
 .state-text.is-done .w{color:#171717}
 
 /* about */
-.about{display:grid;grid-template-columns:32.5rem 1fr;gap:4rem;padding:6rem 3.5rem 8rem;z-index:2;align-items:center}
-.portrait{aspect-ratio:520/640;margin:0}
+.about{display:grid;grid-template-columns:32.5rem 1fr;gap:4rem;padding:6rem 3.5rem 8rem;z-index:2;align-items:stretch}
+.portrait{aspect-ratio:520/640;margin:0;position:sticky;top:5rem;height:fit-content;align-self:start}
 .about-c{display:flex;flex-direction:column;gap:2rem}
 .about-c .eyebrow{margin-bottom:-.5rem}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
