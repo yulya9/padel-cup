@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Padel Cup — Step onto the court</title>
+<meta name="description" content="Padel Cup: a two-day padel tournament for 64 pairs. Nov 21–22, 2026, Miami.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="is-loading">
+
+<!-- Preloader -->
+<div class="preloader dark" id="preloader" aria-hidden="true">
+  <div class="pre-count"><span id="preNum">000</span><i>%</i></div>
+  <div class="pre-ball"></div>
+  <div class="pre-label">Padel Cup 2026</div>
+</div>
+
+<!-- Header -->
+<header class="header dark" id="header">
+  <a class="logo" href="#top" data-scroll><span>Padel Cup</span></a>
+  <nav class="nav">
+    <a href="#about" data-scroll>About the cup</a>
+    <a href="#included" data-scroll>What's included</a>
+    <a href="#schedule" data-scroll>Schedule</a>
+    <a href="#price" data-scroll>Price</a>
+    <a href="#faq" data-scroll>FAQ</a>
+  </nav>
+  <button class="btn btn-white" data-open-popup><span>Register now</span></button>
+</header>
+
+<main id="top">
+
+<!-- Rally background (ball trajectory) -->
+<div class="rally" id="rally" aria-hidden="true"></div>
+
+<!-- HERO -->
+<section class="hero dark" id="hero">
+  <div class="hero-bg"><img src="assets/img/hero.jpg" alt="Padel player in mid-air smash at night"></div>
+  <div class="hero-shade"></div>
+  <div class="hero-curtain"></div>
+  <div class="hero-bottom">
+    <div class="hero-row">
+      <h1 class="display">
+        <span class="ln"><span>Step</span></span>
+        <span class="ln"><span>onto the</span></span>
+        <span class="ln"><span class="lime">court</span></span>
+      </h1>
+      <div class="hero-aside" data-hero-fade>
+        <p class="mono meta"><span>Nov 21–22, 2026</span><span>Miami</span><span>From $149 per pair</span></p>
+        <p class="lead">A padel tournament for 64 pairs. Play your level, win the prize and leave as a champion.</p>
+        <button class="btn btn-mag" data-open-popup><span>Register now</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Lime strip -->
+<div class="strip dark" aria-hidden="true">
+  <div class="s-track" id="stripTrack">
+    <div class="s-group"><span>Padel Cup 2026</span><i>✦</i><span>Nov 21–22</span><i>✦</i><span>Miami</span><i>✦</i><span>Prize pool $10K</span><i>✦</i><span>64 pairs</span><i>✦</i></div>
+    <div class="s-group"><span>Padel Cup 2026</span><i>✦</i><span>Nov 21–22</span><i>✦</i><span>Miami</span><i>✦</i><span>Prize pool $10K</span><i>✦</i><span>64 pairs</span><i>✦</i></div>
+  </div>
+</div>
+
+<!-- INTRO collage -->
+<section class="intro" id="about">
+  <figure class="win reveal c-photo" style="--l:5%;--t:31%;--w:16.6%;--r:4/3" data-speed="0.22"><img src="assets/img/c1.jpg" alt=""></figure>
+  <figure class="win reveal c-photo" style="--l:8.3%;--t:61%;--w:11.1%;--r:3/4" data-speed="0.34"><img src="assets/img/c2.jpg" alt=""></figure>
+  <figure class="win reveal c-photo" style="--l:76.4%;--t:12%;--w:13.9%;--r:1/1" data-speed="0.28"><img src="assets/img/c3.jpg" alt=""></figure>
+  <figure class="win reveal c-photo" style="--l:81.7%;--t:49%;--w:15.5%;--r:4/3" data-speed="0.40"><img src="assets/img/c4.jpg" alt=""></figure>
+  <figure class="win reveal c-photo" style="--l:8.3%;--t:82%;--w:10.5%;--r:3/4" data-speed="0.18"><img src="assets/img/c5.jpg" alt=""></figure>
+  <figure class="win reveal c-photo" style="--l:72.2%;--t:79%;--w:14.4%;--r:4/3" data-speed="0.32"><img src="assets/img/c6.jpg" alt=""></figure>
+
+  <p class="mono eyebrow center" data-reveal>What is Padel Cup</p>
+  <h2 class="h2 center" data-split>Play better, compete smarter, win bigger</h2>
+  <div class="frame" data-reveal>
+    <i class="plus tl"></i><i class="plus tr"></i><i class="plus bl"></i><i class="plus br"></i>
+    <p class="lead-l">Reach your goals. Whether you are playing your first tournament, chasing a trophy or just want a serious weekend of padel, we give you the courts, the bracket and the crowd.</p>
+    <p class="body-m muted">Pick your league, play against people at your level and see exactly where you stand. Every result goes on a live board.</p>
+    <a class="btn btn-ghost" href="#included" data-scroll><span>Learn more about us</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    <div class="giant" aria-hidden="true"><span>The smart</span><span>way to</span><span>your game</span></div>
+    <svg class="ring" id="ring" viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" pathLength="24"/></svg>
+  </div>
+</section>
+
+<!-- Statement -->
+<section class="statement">
+  <p class="mono eyebrow">Our approach</p>
+  <p class="state-text scrub" id="scrub">At Padel Cup, every match is built on the same foundation: fair brackets, pro courts and players at your level. Anyone can enter. We make it count, turning every point into a story worth telling.</p>
+</section>
+
+<!-- About -->
+<section class="about dark">
+  <figure class="win reveal portrait" data-speed="0.05"><img src="assets/img/portrait.jpg" alt="Padel player with racket on shoulder"></figure>
+  <div class="about-c">
+    <p class="mono eyebrow" data-reveal>About the cup</p>
+    <h2 class="h1" data-split>Padel for those who play to win</h2>
+    <p class="lead-l muted" data-reveal>Two days of matches on eight courts, great atmosphere and fair brackets by level. Come with a partner or sign up solo and we will find you a pair.</p>
+    <div class="stats">
+      <div class="stat" data-reveal style="--i:0"><b data-count="64">64</b><span>pairs competing</span></div>
+      <div class="stat" data-reveal style="--i:1"><b data-count="8">8</b><span>courts in play</span></div>
+      <div class="stat" data-reveal style="--i:2"><b data-count="2">2</b><span>days of matches</span></div>
+      <div class="stat" data-reveal style="--i:3"><b data-count="10" data-prefix="$" data-suffix="K">$10K</b><span>prize pool</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Levels -->
+<section class="sec" id="levels">
+  <div class="sec-head">
+    <div><p class="mono eyebrow" data-reveal>Who it's for</p><h2 class="h1" data-split>Pick your league</h2></div>
+    <p class="lead-l muted narrow" data-reveal>Brackets are built by skill level. Play against people at your level.</p>
+  </div>
+  <div class="league" id="league">
+    <div class="lg-tabs" role="tablist" aria-label="Leagues">
+      <button class="lg-tab on" role="tab" aria-selected="true" data-i="0" data-reveal style="--i:0"><span class="mono">01</span><b class="h2">Beginner</b><span class="body-m">New to the racket and want to feel real matches against equals.</span></button>
+      <button class="lg-tab" role="tab" aria-selected="false" data-i="1" data-reveal style="--i:1"><span class="mono">02</span><b class="h2">Amateur</b><span class="body-m">You play regularly, understand tactics and hold the rally.</span></button>
+      <button class="lg-tab" role="tab" aria-selected="false" data-i="2" data-reveal style="--i:2"><span class="mono">03</span><b class="h2">Pro</b><span class="body-m">Confident shots, glass play and tournament experience. Ready to fight for the trophy.</span></button>
+    </div>
+    <div class="lg-panel" role="tabpanel" data-reveal>
+      <div class="lg-top"><span class="mono" id="lgNum">League 01 / 03</span><div class="lg-lv" id="lgLv"><i></i><i></i><i></i></div></div>
+      <h3 class="h1" id="lgTitle">Beginner</h3>
+      <dl class="lg-rows">
+        <div class="lg-row"><dt class="mono">Pairs in bracket</dt><dd id="lgPairs">24</dd><i class="lg-bar"><u id="lgPairsB"></u></i></div>
+        <div class="lg-row"><dt class="mono">Average rally</dt><dd id="lgRally">6 shots</dd><i class="lg-bar"><u id="lgRallyB"></u></i></div>
+        <div class="lg-row"><dt class="mono">League prize</dt><dd id="lgPrize">$1K</dd><i class="lg-bar"><u id="lgPrizeB"></u></i></div>
+        <div class="lg-row"><dt class="mono">Spots left</dt><dd id="lgSpots">4</dd><i class="lg-bar"><u id="lgSpotsB"></u></i></div>
+        <div class="lg-row"><dt class="mono">Match format</dt><dd id="lgFormat" class="lg-text">One set to 6 games</dd></div>
+      </dl>
+      <button class="btn btn-mag" id="lgCta" data-open-popup data-level="Beginner"><span id="lgCtaT">Register as Beginner</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<!-- Crew -->
+<section class="sec dark" id="crew">
+  <div class="ghost" data-ghost>Crew</div>
+  <div class="sec-head">
+    <div><p class="mono eyebrow" data-reveal>#1 padel tournament in the region</p><h2 class="h1" data-split>Meet the court crew</h2></div>
+    <p class="lead-l muted narrow" data-reveal>Our team has run pro tours, club leagues and corporate cups. Now it runs yours: from the draw to the last point.</p>
+  </div>
+  <div class="cards3 crew">
+    <article class="crew-card dark" data-reveal style="--i:0"><div class="win" data-speed="0.03"><img src="assets/img/crew1.jpg" alt="Marco Reyes"></div><div class="crew-txt"><span class="mono">Head coach</span><h3 class="h3">Marco Reyes</h3></div></article>
+    <article class="crew-card dark" data-reveal style="--i:1"><div class="win" data-speed="0.03"><img src="assets/img/crew2.jpg" alt="Elena Park"></div><div class="crew-txt"><span class="mono">Chief referee</span><h3 class="h3">Elena Park</h3></div></article>
+    <article class="crew-card dark" data-reveal style="--i:2"><div class="win" data-speed="0.03"><img src="assets/img/crew3.jpg" alt="Dan Cole"></div><div class="crew-txt"><span class="mono">Tournament director</span><h3 class="h3">Dan Cole</h3></div></article>
+  </div>
+</section>
+
+<!-- Included -->
+<section class="sec" id="included">
+  <div class="pin">
+  <div class="sec-head">
+    <div><p class="mono eyebrow" data-reveal>What's included</p><h2 class="h1 wide" data-split>Everything you need to just play</h2></div>
+    <p class="lead-l muted narrow" data-reveal>The price covers entry, court rental, equipment and water.</p>
+  </div>
+  <div class="cards4">
+    <article class="feat" data-step="card" style="--i:0"><b>001</b><div><h3 class="h3">Entry</h3><p class="body-m">Bracket matches, referees and a live scoreboard on every court.</p></div></article>
+    <article class="feat" data-step="card" style="--i:1"><b>002</b><div><h3 class="h3">Court rental</h3><p class="body-m">Pro glass courts with evening lighting for both days.</p></div></article>
+    <article class="feat" data-step="card" style="--i:2"><b>003</b><div><h3 class="h3">Equipment</h3><p class="body-m">Rackets and balls for anyone who arrives without their own.</p></div></article>
+    <article class="feat" data-step="card" style="--i:3"><b>004</b><div><h3 class="h3">Water</h3><p class="body-m">Refill stations and bottled water at every court.</p></div></article>
+  </div>
+  </div>
+</section>
+
+<!-- Gallery band -->
+<section class="band dark">
+  <div class="band-bg"><img src="assets/img/band.jpg" alt="Padel courts at night"></div>
+  <div class="band-shade"></div>
+  <h2 class="h1" data-split>Two days. One champion.</h2>
+  <p class="body-l" data-reveal>Evening light, glass walls and fans at every court. This is what a real padel tournament feels like.</p>
+</section>
+
+<!-- Process -->
+<section class="sec process dark" id="process">
+  <div class="proc-l">
+    <p class="mono eyebrow" data-reveal>Our process</p>
+    <h2 class="h1" data-split>How a champion gets built</h2>
+    <p class="lead-l muted" data-reveal>Whether you are training for your first cup or your fifth, the path is the same: simple, fair and fast.</p>
+    <button class="btn btn-mag" data-open-popup><span>Book your spot</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+  </div>
+  <div class="steps">
+    <article class="step" data-step style="--i:0"><b>01</b><div><h3 class="h3">Register</h3><p class="body-m muted">Sign up with a partner or solo and pick your league.</p></div></article>
+    <article class="step" data-step style="--i:1"><b>02</b><div><h3 class="h3">Get matched</h3><p class="body-m muted">We build balanced pairs and seed the bracket by level.</p></div></article>
+    <article class="step" data-step style="--i:2"><b>03</b><div><h3 class="h3">Play the groups</h3><p class="body-m muted">Three matches on pro courts to find your rhythm.</p></div></article>
+    <article class="step" data-step style="--i:3"><b>04</b><div><h3 class="h3">Fight for the cup</h3><p class="body-m muted">Knockouts, semifinals and a final under the lights.</p></div></article>
+  </div>
+</section>
+
+<!-- Schedule -->
+<section class="sec" id="schedule">
+  <div class="ghost" data-ghost>Schedule</div>
+  <div class="sec-head">
+    <div><p class="mono eyebrow" data-reveal>Schedule</p><h2 class="h1" data-split>Two days on court</h2></div>
+    <p class="lead-l muted narrow" data-reveal>We will update the match schedule a week before the start and send it to every player.</p>
+  </div>
+  <div class="days">
+    <div class="day">
+      <h3 class="h3" data-reveal>Saturday, Nov 21</h3>
+      <div class="row" data-reveal><b>10:00</b><span class="rt">Check-in and draw</span><span class="rd">Pick up your number, shirt and match schedule.</span></div>
+      <div class="row" data-reveal><b>11:00</b><span class="rt">Group stage</span><span class="rd">Three group matches to warm up and find your rhythm.</span></div>
+      <div class="row" data-reveal><b>17:00</b><span class="rt">Evening matches and masterclass</span><span class="rd">A coach shows how to play off the glass and at the net.</span></div>
+    </div>
+    <div class="day">
+      <h3 class="h3" data-reveal>Sunday, Nov 22</h3>
+      <div class="row" data-reveal><b>11:00</b><span class="rt">Playoffs</span><span class="rd">Group winners move into the knockout bracket.</span></div>
+      <div class="row" data-reveal><b>15:00</b><span class="rt">Semifinals and finals</span><span class="rd">The fight for the cup in every league.</span></div>
+      <div class="row" data-reveal><b>19:00</b><span class="rt">Awards and after-party</span><span class="rd">Prizes, court photos and music into the night.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Recap + quotes -->
+<section class="sec" id="recap">
+  <div class="sec-head">
+    <div><p class="mono eyebrow" data-reveal>Featured from last season</p><h2 class="h1" data-split>Moments from the court</h2></div>
+    <a class="btn btn-ghost" href="#recap" data-scroll><span>All stories</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+  </div>
+  <div class="cards2">
+    <article class="recap" data-reveal style="--i:0"><div class="win zoom" data-speed="0.02"><img src="assets/img/recap1.jpg" alt="Winners with a trophy"></div><p class="mono pair"><span>Cup Series</span><span>Nov 2025</span></p><h3 class="h3">Pro league final: a 3-set thriller</h3></article>
+    <article class="recap" data-reveal style="--i:1"><div class="win zoom" data-speed="0.02"><img src="assets/img/recap2.jpg" alt="Indoor padel arena"></div><p class="mono pair"><span>Open Day</span><span>Sep 2025</span></p><h3 class="h3">Two hundred players, eight courts, one night</h3></article>
+  </div>
+  <div class="car-head" data-reveal>
+    <p class="mono eyebrow">What our players say</p>
+    <div class="car-ctrl">
+      <span class="mono car-count" id="carCount" aria-live="polite">01 / 06</span>
+    </div>
+  </div>
+  <div class="car" id="car" data-cursor="Drag" tabindex="0" data-reveal role="region" aria-roledescription="carousel" aria-label="Player reviews">
+    <div class="car-track" id="carTrack">
+      <blockquote class="quote" aria-roledescription="slide"><p class="body-l">“The best organised amateur tournament I have played. Fair brackets, and every match felt like it mattered.”</p><footer><b class="h3">Sofia M.</b><span class="mono">Amateur league winner</span></footer></blockquote>
+      <blockquote class="quote" aria-roledescription="slide"><p class="body-l">“Signed up solo, got a great partner and reached the semifinal. Already booked next season.”</p><footer><b class="h3">Jamal T.</b><span class="mono">Beginner league</span></footer></blockquote>
+      <blockquote class="quote" aria-roledescription="slide"><p class="body-l">“Pro courts, a live scoreboard and a real crowd. It felt like a tour stop.”</p><footer><b class="h3">Lukas H.</b><span class="mono">Pro league finalist</span></footer></blockquote>
+      <blockquote class="quote" aria-roledescription="slide"><p class="body-l">“Level matching works: every game was close, and the referees were spot on.”</p><footer><b class="h3">Maria K.</b><span class="mono">Amateur league</span></footer></blockquote>
+      <blockquote class="quote" aria-roledescription="slide"><p class="body-l">“Glass courts under the lights are unreal. We brought the whole team and we are back next year.”</p><footer><b class="h3">Tom R.</b><span class="mono">Corporate team</span></footer></blockquote>
+      <blockquote class="quote" aria-roledescription="slide"><p class="body-l">“Smooth check-in, a live bracket on my phone and free water on every court. Zero stress.”</p><footer><b class="h3">Dana L.</b><span class="mono">Beginner league</span></footer></blockquote>
+    </div>
+  </div>
+  <div class="car-bar" aria-hidden="true"><i id="carBar"></i></div>
+</section>
+
+<!-- Pricing -->
+<section class="sec" id="price">
+  <div class="price-card dark" data-reveal>
+    <div class="price-l">
+      <p class="mono eyebrow">Price</p>
+      <div class="price-n" data-count="149" data-prefix="$">$149</div>
+      <p class="lead-l">per pair. $75 per player, all included.</p>
+      <div class="spots"><p class="mono">12 of 64 spots left</p><div class="track"><i id="spotsFill"></i></div></div>
+      <button class="btn btn-mag" data-open-popup><span>Register now</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+    </div>
+    <ul class="price-r">
+      <li><i class="chk"></i>Tournament entry</li>
+      <li><i class="chk"></i>Court rental for two days</li>
+      <li><i class="chk"></i>Equipment: rackets and balls</li>
+      <li><i class="chk"></i>Drinking water</li>
+    </ul>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec faq-sec" id="faq">
+  <div class="faq-l"><p class="mono eyebrow" data-reveal>FAQ</p><h2 class="h1" data-split>Need to know</h2></div>
+  <div class="faq" id="faq-list">
+    <div class="qa open" data-reveal><button class="q" aria-expanded="true"><span class="h3">Do I need a partner?</span><i class="pm"></i></button><div class="a"><p class="body-m muted">No, we will match you with a partner of your level. Sign up solo and the organizers will build a balanced pair before the start.</p></div></div>
+    <div class="qa" data-reveal style="--i:1"><button class="q" aria-expanded="false"><span class="h3">What should I bring?</span><i class="pm"></i></button><div class="a"><p class="body-m muted">Just sportswear and court shoes. We provide rackets and balls on site.</p></div></div>
+    <div class="qa" data-reveal style="--i:2"><button class="q" aria-expanded="false"><span class="h3">Can I get a refund?</span><i class="pm"></i></button><div class="a"><p class="body-m muted">Full refund up to seven days before the start. After that we move your entry to the next tournament.</p></div></div>
+    <div class="qa" data-reveal style="--i:3"><button class="q" aria-expanded="false"><span class="h3">I'm a beginner. Is it for me?</span><i class="pm"></i></button><div class="a"><p class="body-m muted">Yes, there is a separate beginner league: you only play people at your level.</p></div></div>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section class="sec news">
+  <p class="mono eyebrow center" data-reveal>Sign up to updates</p>
+  <h2 class="h1 center" data-split>Stay ahead of the game</h2>
+  <p class="lead-l muted center narrow-c" data-reveal>Training tips, bracket news and early access to the next Padel Cup. No spam, one email a month.</p>
+  <form class="news-form" id="newsForm" novalidate data-reveal>
+    <label class="field"><span class="mono">Email</span><input type="email" name="email" placeholder="you@email.com" autocomplete="email"><em class="err mono"></em></label>
+    <button class="btn" type="submit"><span>Subscribe</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+  </form>
+</section>
+
+<!-- Final CTA -->
+<section class="final-wrap">
+  <div class="final dark">
+    <div class="final-bg"><img src="assets/img/band.jpg" alt=""></div>
+    <h2 class="display center" data-split-lines><span class="ln"><span>Claim</span></span><span class="ln"><span class="lime">your court</span></span></h2>
+    <button class="btn btn-mag" data-open-popup><span>Register now</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer dark">
+  <div class="foot-top">
+    <a class="logo" href="#top" data-scroll><span>Padel Cup</span></a>
+    <ul class="foot-nav"><li><a href="#about" data-scroll>About the cup</a></li><li><a href="#included" data-scroll>What's included</a></li><li><a href="#schedule" data-scroll>Schedule</a></li><li><a href="#price" data-scroll>Price</a></li><li><a href="#faq" data-scroll>FAQ</a></li></ul>
+    <div class="foot-c"><p class="mono">Contacts</p><p>hello@padelcup.com</p><p>+1 (305) 000-00-00</p><p>Miami, 10 Ocean Drive</p></div>
+  </div>
+  <div class="foot-bot"><p class="muted">© 2026 Padel Cup. All rights reserved.</p><a class="muted" href="#top">Privacy policy</a></div>
+</footer>
+
+<!-- POPUP -->
+<div class="popup" id="popup" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="pTitle">
+  <div class="p-overlay" data-close></div>
+  <div class="modal dark">
+    <button class="p-close" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <form class="p-form" id="regForm" novalidate>
+      <div class="p-head"><h2 class="h2" id="pTitle">Tournament registration</h2><p class="body-m muted">Leave your contacts and the organizer will confirm your entry within a day.</p></div>
+      <label class="field"><span class="mono">Name</span><input name="name" type="text" placeholder="How should we call you" autocomplete="name"><em class="err mono"></em></label>
+      <div class="field"><span class="mono">Skill level</span>
+        <div class="levels" role="radiogroup" aria-label="Skill level">
+          <button type="button" class="lv" role="radio" aria-checked="false" data-v="Beginner">Beginner</button>
+          <button type="button" class="lv on" role="radio" aria-checked="true" data-v="Amateur">Amateur</button>
+          <button type="button" class="lv" role="radio" aria-checked="false" data-v="Pro">Pro</button>
+        </div>
+      </div>
+      <label class="field"><span class="mono">Contact</span><input name="contact" type="text" placeholder="Email or phone" autocomplete="email"><em class="err mono"></em></label>
+      <button class="btn btn-full" type="submit"><span>Submit</span><svg class="ar" viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg></button>
+      <p class="body-m muted small">By clicking the button you agree to the privacy policy.</p>
+    </form>
+    <div class="p-ok" id="regOk" hidden>
+      <div class="ok-badge"><svg viewBox="0 0 48 48"><path id="okPath" d="M10 25l9 9L38 14"/></svg></div>
+      <h2 class="h2">You are in</h2>
+      <p class="body-l muted">We will contact you within a day to confirm your entry. See you on the court.</p>
+      <div class="chips"><span class="chip on">Nov 21–22, 2026</span><span class="chip">Miami</span></div>
+      <button class="btn btn-ghost btn-full" data-close><span>Close</span></button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/vendor/lenis.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
