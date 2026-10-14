@@ -139,6 +139,7 @@
 
   /* ---------- per-frame scroll effects ---------- */
   var heroEl = $('#hero'), heroImg = $('.hero-bg img'), header = $('#header'), ring = $('#ring');
+  var scrubs = $$('[data-scrub]').map(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.hasAttribute('data-scrub'); }); el._i = el.style.getPropertyValue('--i') !== '' ? parseFloat(el.style.getPropertyValue('--i')) : sib.indexOf(el); el._ty = 0; el._win = el.getAttribute('data-scrub') === 'media' ? el.querySelector('.win') : null; return el; });
   var wins = $$('[data-speed]'), ghosts = $$('[data-ghost]'), steps = $$('[data-step]'), pxImgs = $$('.band-bg img,.final-bg img');
   var lastScroll = 0, heroH = heroEl.offsetHeight;
   function update(scroll) {
@@ -183,6 +184,16 @@
         var t2 = easeOutCubic(clamp((0.95 * vh - top) / (0.3 * vh), 0, 1));
         s.style.transform = 'translate3d(0,' + ((1 - t2) * 60) + 'px,0)'; s.style.opacity = t2;
       }
+    });
+    // scrubbed reveals: card = lift + scale, row = wipe from the left, media = lift + photo unmasked from the bottom; siblings enter one after another
+    scrubs.forEach(function (el) {
+      var kind = el.getAttribute('data-scrub'), r = el.getBoundingClientRect(), top = r.top - el._ty;
+      var t = reduce ? 1 : easeOutCubic(clamp((vh * 0.97 - el._i * vh * 0.05 - top) / (vh * 0.3), 0, 1)), ty = 0, st = el.style;
+      if (kind === 'row') { ty = 0; st.clipPath = t >= 1 ? '' : 'inset(0 ' + ((1 - t) * 100) + '% 0 0)'; st.transform = t >= 1 ? '' : 'translate3d(' + ((1 - t) * -2) + 'rem,0,0)'; }
+      else { ty = (1 - t) * (kind === 'card' ? 80 : 56); st.transform = t >= 1 ? '' : 'translate3d(0,' + ty + 'px,0)' + (kind === 'card' ? ' scale(' + (0.92 + 0.08 * t) + ')' : ''); }
+      st.opacity = kind === 'row' ? 1 : Math.min(1, t * 1.6);
+      if (el._win) { var pt = easeOutCubic(clamp((t - 0.15) / 0.85, 0, 1)); el._win.style.clipPath = pt >= 1 ? '' : 'inset(' + ((1 - pt) * 100) + '% 0 0 0)'; var im = el._win.firstElementChild; if (im) im.style.scale = 1 + 0.25 * (1 - pt); }
+      el._ty = ty;
     });
     if (ring) ring.style.transform = 'rotate(' + (scroll * 0.25) + 'deg)';
     updateRally(scroll);

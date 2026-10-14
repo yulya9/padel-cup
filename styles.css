@@ -413,3 +413,9 @@ input:focus{border-color:var(--fg);outline:none;box-shadow:inset 0 0 0 1px var(-
 .cur b{position:absolute;left:0;top:0;width:5.5rem;height:5.5rem;margin:-2.75rem 0 0 -2.75rem;border-radius:50%;background:#A8EB33;color:#141414;display:grid;place-items:center;font:500 .8125rem/1 'DM Mono',monospace;text-transform:uppercase;transform:scale(0);opacity:0;transition:transform .7s var(--ease),opacity .4s var(--ease)}
 .cur.on b{transform:scale(1);opacity:.96}
 @media (hover:none){.cur{display:none}}
+
+/* scroll-scrubbed reveals: progress follows the scroll position (app.js), so transitions on opacity/transform are off */
+[data-scrub]{opacity:0;will-change:transform,opacity;transition:background .5s var(--ease),color .6s var(--ease),border-color .5s var(--ease),box-shadow .5s var(--ease)!important}
+[data-scrub="card"]{transform-origin:50% 0}
+[data-scrub="media"] .win img{transition:none}
+@media (prefers-reduced-motion:reduce){[data-scrub]{opacity:1!important;transform:none!important;clip-path:none!important}[data-scrub] .win{clip-path:none!important}}
