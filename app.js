@@ -221,16 +221,22 @@
 
   /* ---------- Lenis + single rAF loop ---------- */
   var lenis = null;
-  if (!reduce && window.Lenis) {
+  // Safari: JS-driven smooth scroll makes every frame main-thread bound and it stutters, so it keeps the native (compositor) scroll
+  var isSafari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+  if (!reduce && !isSafari && window.Lenis) {
     lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.95, smoothWheel: true });
     (function raf(t) { lenis.raf(t); update(lenis.scroll); requestAnimationFrame(raf); })(performance.now());
   } else {
-    window.addEventListener('scroll', function () { update(window.scrollY); }, { passive: true });
+    var queued = false;
+    window.addEventListener('scroll', function () {
+      if (queued) return; queued = true;
+      requestAnimationFrame(function () { queued = false; update(window.scrollY); });
+    }, { passive: true });
     update(window.scrollY);
   }
   var scrollTo = function (target) {
     if (lenis) lenis.scrollTo(target, { offset: -64, duration: 1.5, easing: function (t) { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); } });
-    else target.scrollIntoView({ behavior: 'smooth' });
+    else window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 64, behavior: 'smooth' });
   };
   $$('[data-scroll]').forEach(function (a) {
     a.addEventListener('click', function (e) {
@@ -376,11 +382,11 @@
   var popup = $('#popup'), form = $('#regForm'), ok = $('#regOk'), lastFocus = null;
   function openPopup(level) {
     if (level) $$('.lv').forEach(function (x) { var on = x.getAttribute('data-v') === level; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); });
-    lastFocus = document.activeElement; popup.classList.add('open'); popup.setAttribute('aria-hidden', 'false'); if (lenis) lenis.stop();
+    lastFocus = document.activeElement; popup.classList.add('open'); popup.setAttribute('aria-hidden', 'false'); if (lenis) lenis.stop(); else document.documentElement.style.overflow = 'hidden';
     setTimeout(function () { var n = form.elements.name; if (n) n.focus({ preventScroll: true }); }, 500);
   }
   function closePopup() {
-    popup.classList.remove('open'); popup.setAttribute('aria-hidden', 'true'); if (lenis) lenis.start();
+    popup.classList.remove('open'); popup.setAttribute('aria-hidden', 'true'); if (lenis) lenis.start(); else document.documentElement.style.overflow = '';
     setTimeout(function () { form.hidden = false; ok.hidden = true; form.reset(); $$('.field', form).forEach(function (f) { f.classList.remove('invalid'); }); var b = $('.btn[type=submit]', form); b.classList.remove('is-loading'); }, 800);
     if (lastFocus) lastFocus.focus({ preventScroll: true });
   }

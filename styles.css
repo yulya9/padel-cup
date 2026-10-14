@@ -171,7 +171,7 @@ section{position:relative}
 /* statement */
 .statement{display:grid;grid-template-columns:14rem 1fr;gap:4rem;padding:6rem 3.5rem 8rem;z-index:2}
 .state-text{font:500 3rem/1.1 'Geist';letter-spacing:-.02em;max-width:66rem}
-.scrub .w{color:#B0B0B0;transition:color .15s linear;display:inline}
+.scrub .w{color:#B0B0B0;display:inline}
 .state-text.is-done .w{color:#171717}
 
 /* about */
