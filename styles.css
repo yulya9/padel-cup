@@ -320,10 +320,10 @@ section{position:relative}
 .news .eyebrow{margin-bottom:-.5rem}
 .news-form{display:flex;gap:1rem;align-items:flex-start;width:40rem}
 .news-form .field{flex:1;text-align:left}
-.news-form .btn{margin-top:1.8rem}
+.news-form .btn{margin-top:calc(.875rem * 1.3 + .5rem)}
 .field{display:flex;flex-direction:column;gap:.5rem;position:relative}
 .field>.mono{color:var(--mut)}
-input{height:4rem;background:var(--sf2);border:1px solid var(--bd);padding:0 1.5rem;font:400 1rem 'Geist';color:var(--fg);border-radius:0;transition:border-color .4s var(--ease),background .4s var(--ease)}
+input{height:3.5rem;background:var(--sf2);border:1px solid var(--bd);padding:0 1.5rem;font:400 1rem 'Geist';color:var(--fg);border-radius:0;transition:border-color .4s var(--ease),background .4s var(--ease)}
 input::placeholder{color:var(--mut);opacity:1}
 input:focus{border-color:var(--fg);outline:none;box-shadow:inset 0 0 0 1px var(--fg)}
 .err{display:none;color:var(--err);font-style:normal;text-transform:none;letter-spacing:0;font-size:.875rem}
