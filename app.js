@@ -5,6 +5,9 @@
 (function () {
   'use strict';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Safari scrolls on the compositor, so JS-driven parallax visibly lags behind the page there; it keeps native scroll and drops continuous parallax (add ?fx=full to compare)
+  var isSafari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+  var lite = isSafari && !/[?&]fx=full/.test(location.search);
   var body = document.body;
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -109,39 +112,40 @@
       }
       bIdx.push(pts.length - 1); x = nx; y += step; dir *= -1;
     }
-    var d = 'M ' + pts.map(function (q) { return q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join(' L ');
-    var ns = 'http://www.w3.org/2000/svg', vb = '0 0 ' + W + ' ' + H;
-    var trail = document.createElementNS(ns, 'svg'), rings = document.createElementNS(ns, 'svg');
-    trail.setAttribute('viewBox', vb); trail.setAttribute('preserveAspectRatio', 'none');
-    rings.setAttribute('viewBox', vb); rings.setAttribute('preserveAspectRatio', 'none');
-    trail.innerHTML = '<path d="' + d + '" fill="none" stroke="#171717" stroke-opacity=".16" stroke-width="1.5" stroke-dasharray="2 10" stroke-linecap="round"/>';
-    var html = '';
-    bIdx.forEach(function (bi) {
-      var q = pts[bi];
-      html += '<ellipse class="ring-b" cx="' + q[0] + '" cy="' + q[1] + '" rx="84" ry="22"/><ellipse class="ring-a" cx="' + q[0] + '" cy="' + q[1] + '" rx="44" ry="12"/><circle class="dot" cx="' + q[0] + '" cy="' + q[1] + '" r="5"/>';
-    });
-    rings.innerHTML = html;
-    var ballEl = document.createElement('div'); ballEl.className = 'ball';
-    rallyEl.innerHTML = ''; rallyEl.appendChild(trail); rallyEl.appendChild(rings); rallyEl.appendChild(ballEl);
-    rally = { top: top, H: H, total: total, pts: pts, cum: cum, bIdx: bIdx, trail: trail, ball: ballEl, rings: $$('.ring-a,.ring-b,.dot', rings), hits: bIdx.map(function () { return false; }), by: -1 };
+    var cv = rallyEl.querySelector('canvas');
+    if (!cv) { cv = document.createElement('canvas'); cv.className = 'rally-cv'; rallyEl.innerHTML = ''; rallyEl.appendChild(cv); }
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(vh * dpr); cv.style.width = W + 'px'; cv.style.height = vh + 'px';
+    rally = { top: top, H: H, W: W, total: total, pts: pts, cum: cum, bIdx: bIdx, cv: cv, ctx: cv.getContext('2d'), dpr: dpr };
   }
+  // one viewport-sized canvas: draws only the visible part of the dotted trail, the bounce rings and the ball, so nothing page-tall is ever repainted
   function updateRally(scroll) {
     if (!rally) return;
-    // y of the ball in the layer = the scroll position plus a fixed spot on the screen, so it never drifts away from the viewport
-    var wy = clamp(scroll + vh * 0.55 - rally.top, 0, rally.pts[rally.pts.length - 1][1]), lo = 0, hi = rally.pts.length - 1;
-    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (rally.pts[mid][1] <= wy) lo = mid; else hi = mid; }
-    var a = rally.pts[lo], b = rally.pts[hi], f = b[1] === a[1] ? 0 : clamp((wy - a[1]) / (b[1] - a[1]), 0, 1);
-    var bx = a[0] + (b[0] - a[0]) * f, by = a[1] + (b[1] - a[1]) * f, len = rally.cum[lo] + (rally.cum[hi] - rally.cum[lo]) * f;
-    // the trail only goes down, so revealing it is a plain clip by height; the ball is a small composited element
-    if (Math.abs(by - rally.by) >= 1) {
-      rally.by = by;
-      rally.trail.style.clipPath = 'inset(0 0 ' + Math.max(0, rally.H - by) + 'px 0)';
-      rally.ball.style.transform = 'translate3d(' + (bx - 12).toFixed(1) + 'px,' + (by - 12).toFixed(1) + 'px,0)';
+    var R = rally; if (R.ls === scroll && R.lv === vh) return; R.ls = scroll; R.lv = vh;
+    var c = R.ctx, pts = R.pts, last = pts.length - 1, off = R.top - scroll;
+    var wy = clamp(scroll + vh * 0.55 - R.top, 0, pts[last][1]), lo = 0, hi = last;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (pts[mid][1] <= wy) lo = mid; else hi = mid; }
+    var a0 = pts[lo], b0 = pts[hi], f = b0[1] === a0[1] ? 0 : clamp((wy - a0[1]) / (b0[1] - a0[1]), 0, 1);
+    var bx = a0[0] + (b0[0] - a0[0]) * f, by = a0[1] + (b0[1] - a0[1]) * f, len = R.cum[lo] + (R.cum[hi] - R.cum[lo]) * f;
+    c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0); c.clearRect(0, 0, R.W, vh);
+    var vmin = -off - 60, vmax = -off + vh + 60;
+    // trail: from the first visible point up to the ball
+    var s = 0, h2 = lo; while (h2 - s > 1) { var m2 = (s + h2) >> 1; if (pts[m2][1] < vmin) s = m2; else h2 = m2; }
+    if (by > vmin) {
+      c.beginPath(); c.moveTo(pts[s][0], pts[s][1] + off);
+      for (var i = s + 1; i <= lo; i++) { if (pts[i][1] > vmax) break; c.lineTo(pts[i][0], pts[i][1] + off); }
+      if (by <= vmax) c.lineTo(bx, by + off);
+      c.setLineDash([2, 10]); c.lineDashOffset = -R.cum[s]; c.lineCap = 'round'; c.lineWidth = 1.5; c.strokeStyle = 'rgba(23,23,23,.16)'; c.stroke(); c.setLineDash([]);
     }
-    for (var i = 0; i < rally.bIdx.length; i++) {
-      var hit = len >= rally.cum[rally.bIdx[i]] - 6;
-      if (hit !== rally.hits[i]) { rally.hits[i] = hit; for (var j = 0; j < 3; j++) rally.rings[i * 3 + j].classList.toggle('hit', hit); }
+    // bounce rings grow in once the ball has passed the point
+    for (var k = 0; k < R.bIdx.length; k++) {
+      var q = pts[R.bIdx[k]], y = q[1] + off; if (q[1] < vmin - 40 || q[1] > vmax + 40) continue;
+      var g = easeOutCubic(clamp((len - R.cum[R.bIdx[k]] + 6) / 260, 0, 1)); if (g <= 0) continue;
+      c.lineWidth = 1.5; c.strokeStyle = 'rgba(23,23,23,' + (0.08 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 84 * (0.2 + 0.8 * g), 22 * (0.2 + 0.8 * g), 0, 0, 6.2832); c.stroke();
+      c.strokeStyle = 'rgba(23,23,23,' + (0.16 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 44 * (0.2 + 0.8 * g), 12 * (0.2 + 0.8 * g), 0, 0, 6.2832); c.stroke();
+      c.fillStyle = 'rgba(23,23,23,' + (0.18 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 5, 0, 6.2832); c.fill();
     }
+    if (by + off > -20 && by + off < vh + 20) { c.fillStyle = 'rgba(201,201,201,.6)'; c.beginPath(); c.arc(bx, by + off, 12, 0, 6.2832); c.fill(); }
   }
 
   /* ---------- per-frame scroll effects ---------- */
@@ -163,9 +167,9 @@
     var delta = scroll - lastScroll; lastScroll = scroll;
     mq2(delta);
     // hero parallax
-    if (scroll < heroH * 1.2) put(heroImg, 'translate', '0 ' + (scroll * 0.22).toFixed(1) + 'px');
+    if (!lite && scroll < heroH * 1.2) put(heroImg, 'translate', '0 ' + (scroll * 0.22).toFixed(1) + 'px');
     // parallax windows: wrapper moves one way, picture inside the other
-    wins.forEach(function (w) {
+    if (!lite) wins.forEach(function (w) {
       var r = rect(w); if (r.bottom < -400 || r.top > vh + 400) return;
       var s = parseFloat(w.getAttribute('data-speed')), d = r.top + r.height / 2 - vh / 2;
       var isCollage = w.classList.contains('c-photo'), img = w.firstElementChild;
@@ -173,7 +177,7 @@
       put(w, 'translate', '0 ' + (isCollage ? d * s : -d * s * 0.4).toFixed(1) + 'px');
       if (img) { var lim = r.height * 0.1; put(img, 'transform', 'translate3d(0,' + clamp(isCollage ? -d * s * 0.12 : d * s * 0.3, -lim, lim).toFixed(1) + 'px,0)'); }
     });
-    pxImgs.forEach(function (im, k) {
+    if (!lite) pxImgs.forEach(function (im, k) {
       var r = rect(pxSecs[k]); if (r.bottom < 0 || r.top > vh) return;
       put(im, 'transform', 'translate3d(0,' + ((r.top + r.height / 2 - vh / 2) * -0.12).toFixed(1) + 'px,0)');
     });
@@ -212,7 +216,7 @@
       if (el._win) { var pt = easeOutCubic(clamp((t - 0.15) / 0.85, 0, 1)); el._win.style.clipPath = pt >= 1 ? '' : 'inset(' + ((1 - pt) * 100).toFixed(2) + '% 0 0 0)'; var im = el._win.firstElementChild; if (im) im.style.scale = (1 + 0.25 * (1 - pt)).toFixed(4); }
       el._ty = ty;
     });
-    if (ring) put(ring, 'transform', 'rotate(' + (scroll * 0.25).toFixed(1) + 'deg)');
+    if (ring && !lite) put(ring, 'transform', 'rotate(' + (scroll * 0.25).toFixed(1) + 'deg)');
     updateRally(scroll);
     // header stays pinned; it turns light once the hero is behind it
     var light = scroll > heroH - 70;
@@ -221,8 +225,6 @@
 
   /* ---------- Lenis + single rAF loop ---------- */
   var lenis = null;
-  // Safari: JS-driven smooth scroll makes every frame main-thread bound and it stutters, so it keeps the native (compositor) scroll
-  var isSafari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
   if (!reduce && !isSafari && window.Lenis) {
     lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.95, smoothWheel: true });
     (function raf(t) { lenis.raf(t); update(lenis.scroll); requestAnimationFrame(raf); })(performance.now());
