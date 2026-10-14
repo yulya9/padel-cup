@@ -147,6 +147,8 @@
     if (body.classList.contains('ready')) checkReveal();
     // hero parallax
     if (scroll < heroH * 1.2) { heroImg.style.translate = '0 ' + (scroll * 0.22) + 'px'; }
+    // hero squeeze on scroll: scale from 1 to 0.92 over the hero height
+    if (scroll < heroH) { var p = scroll / heroH; heroEl.style.transform = 'scaleX(' + (1 - p * 0.08) + ')'; } else { heroEl.style.transform = 'scaleX(0.92)'; }
     // parallax windows: wrapper moves one way, picture inside the other
     wins.forEach(function (w) {
       var r = w.getBoundingClientRect(); if (r.bottom < -400 || r.top > vh + 400) return;
