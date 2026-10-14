@@ -62,12 +62,12 @@
   counters.forEach(function (el) { if (!reduce) el.textContent = (el.getAttribute('data-prefix') || '') + '0' + (el.getAttribute('data-suffix') || ''); });
   function checkReveal() {
     if (!pending.length && !counters.length) return;
-    var line = vh * 0.9;
-    pending = pending.filter(function (el) {
-      if (reduce || el.getBoundingClientRect().top < line) { el.classList.add('in'); dropHook(el); return false; } return true;
+    var pt = pending.map(function (el) { return rect(el).top; }), ct = counters.map(function (el) { return rect(el).top; });
+    pending = pending.filter(function (el, k) {
+      if (reduce || pt[k] < vh * 0.9) { el.classList.add('in'); dropHook(el); return false; } return true;
     });
-    counters = counters.filter(function (el) {
-      if (reduce || el.getBoundingClientRect().top < vh * 0.88) { runCount(el); return false; } return true;
+    counters = counters.filter(function (el, k) {
+      if (reduce || ct[k] < vh * 0.88) { runCount(el); return false; } return true;
     });
   }
 
@@ -110,17 +110,20 @@
       bIdx.push(pts.length - 1); x = nx; y += step; dir *= -1;
     }
     var d = 'M ' + pts.map(function (q) { return q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join(' L ');
-    var ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('preserveAspectRatio', 'none');
-    var html = '<defs><mask id="rm" maskUnits="userSpaceOnUse" x="-200" y="-600" width="' + (W + 400) + '" height="' + (H + 1200) + '"><path id="rmp" d="' + d + '" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="' + total + '" stroke-dashoffset="' + total + '"/></mask></defs>' +
-      '<path d="' + d + '" fill="none" stroke="#171717" stroke-opacity=".16" stroke-width="1.5" stroke-dasharray="2 10" stroke-linecap="round" mask="url(#rm)"/>';
+    var ns = 'http://www.w3.org/2000/svg', vb = '0 0 ' + W + ' ' + H;
+    var trail = document.createElementNS(ns, 'svg'), rings = document.createElementNS(ns, 'svg');
+    trail.setAttribute('viewBox', vb); trail.setAttribute('preserveAspectRatio', 'none');
+    rings.setAttribute('viewBox', vb); rings.setAttribute('preserveAspectRatio', 'none');
+    trail.innerHTML = '<path d="' + d + '" fill="none" stroke="#171717" stroke-opacity=".16" stroke-width="1.5" stroke-dasharray="2 10" stroke-linecap="round"/>';
+    var html = '';
     bIdx.forEach(function (bi) {
       var q = pts[bi];
       html += '<ellipse class="ring-b" cx="' + q[0] + '" cy="' + q[1] + '" rx="84" ry="22"/><ellipse class="ring-a" cx="' + q[0] + '" cy="' + q[1] + '" rx="44" ry="12"/><circle class="dot" cx="' + q[0] + '" cy="' + q[1] + '" r="5"/>';
     });
-    html += '<circle class="ball" id="rball" r="12" cx="' + pts[0][0] + '" cy="0"/>';
-    svg.innerHTML = html; rallyEl.innerHTML = ''; rallyEl.appendChild(svg);
-    rally = { top: top, H: H, total: total, pts: pts, cum: cum, bIdx: bIdx, mask: $('#rmp', svg), ball: $('#rball', svg), rings: $$('.ring-a,.ring-b,.dot', svg), hits: bIdx.map(function () { return false; }) };
+    rings.innerHTML = html;
+    var ballEl = document.createElement('div'); ballEl.className = 'ball';
+    rallyEl.innerHTML = ''; rallyEl.appendChild(trail); rallyEl.appendChild(rings); rallyEl.appendChild(ballEl);
+    rally = { top: top, H: H, total: total, pts: pts, cum: cum, bIdx: bIdx, trail: trail, ball: ballEl, rings: $$('.ring-a,.ring-b,.dot', rings), hits: bIdx.map(function () { return false; }), by: -1 };
   }
   function updateRally(scroll) {
     if (!rally) return;
@@ -129,8 +132,12 @@
     while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (rally.pts[mid][1] <= wy) lo = mid; else hi = mid; }
     var a = rally.pts[lo], b = rally.pts[hi], f = b[1] === a[1] ? 0 : clamp((wy - a[1]) / (b[1] - a[1]), 0, 1);
     var bx = a[0] + (b[0] - a[0]) * f, by = a[1] + (b[1] - a[1]) * f, len = rally.cum[lo] + (rally.cum[hi] - rally.cum[lo]) * f;
-    rally.mask.setAttribute('stroke-dashoffset', rally.total - len);
-    rally.ball.setAttribute('cx', bx); rally.ball.setAttribute('cy', by);
+    // the trail only goes down, so revealing it is a plain clip by height; the ball is a small composited element
+    if (Math.abs(by - rally.by) >= 1) {
+      rally.by = by;
+      rally.trail.style.clipPath = 'inset(0 0 ' + Math.max(0, rally.H - by) + 'px 0)';
+      rally.ball.style.transform = 'translate3d(' + (bx - 12).toFixed(1) + 'px,' + (by - 12).toFixed(1) + 'px,0)';
+    }
     for (var i = 0; i < rally.bIdx.length; i++) {
       var hit = len >= rally.cum[rally.bIdx[i]] - 6;
       if (hit !== rally.hits[i]) { rally.hits[i] = hit; for (var j = 0; j < 3; j++) rally.rings[i * 3 + j].classList.toggle('hit', hit); }
@@ -139,63 +146,73 @@
 
   /* ---------- per-frame scroll effects ---------- */
   var heroEl = $('#hero'), heroImg = $('.hero-bg img'), header = $('#header'), ring = $('#ring');
-  var scrubs = $$('[data-scrub]').map(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.hasAttribute('data-scrub'); }); el._i = el.style.getPropertyValue('--i') !== '' ? parseFloat(el.style.getPropertyValue('--i')) : sib.indexOf(el); el._ty = 0; el._win = el.getAttribute('data-scrub') === 'media' ? el.querySelector('.win') : null; return el; });
+  var scrubs = $$('[data-scrub]').map(function (el) { var sib = Array.prototype.filter.call(el.parentNode.children, function (c) { return c.hasAttribute('data-scrub'); }); el._i = el.style.getPropertyValue('--i') !== '' ? parseFloat(el.style.getPropertyValue('--i')) : sib.indexOf(el); el._ty = 0; el._t = -1; el._win = el.getAttribute('data-scrub') === 'media' ? el.querySelector('.win') : null; return el; });
   var wins = $$('[data-speed]'), ghosts = $$('[data-ghost]'), steps = $$('[data-step]'), pxImgs = $$('.band-bg img,.final-bg img');
-  var lastScroll = 0, heroH = heroEl.offsetHeight;
+  var pxSecs = pxImgs.map(function (im) { return im.closest('section'); });
+  var stepSecs = steps.map(function (s) { return s.getAttribute('data-step') === 'card' ? s.closest('section') : null; });
+  var lastScroll = 0, heroH = heroEl.offsetHeight, frame = 0;
+  // geometry is read once per frame before any write, and a style is only written when its value changed (cheap in Safari)
+  function rect(el) { if (el._f !== frame) { el._r = el.getBoundingClientRect(); el._f = frame; } return el._r; }
+  function put(el, prop, v) { var k = '_p' + prop; if (el[k] !== v) { el[k] = v; el.style[prop] = v; } }
   function update(scroll) {
+    frame++;
+    wins.forEach(rect); steps.forEach(rect); scrubs.forEach(rect); ghosts.forEach(rect); pxSecs.forEach(rect);
+    stepSecs.forEach(function (s) { if (s) rect(s); });
+    if (scrub) rect(scrub);
+    if (body.classList.contains('ready')) checkReveal();
     var delta = scroll - lastScroll; lastScroll = scroll;
     mq2(delta);
-    if (body.classList.contains('ready')) checkReveal();
     // hero parallax
-    if (scroll < heroH * 1.2) { heroImg.style.translate = '0 ' + (scroll * 0.22) + 'px'; }
+    if (scroll < heroH * 1.2) put(heroImg, 'translate', '0 ' + (scroll * 0.22).toFixed(1) + 'px');
     // parallax windows: wrapper moves one way, picture inside the other
     wins.forEach(function (w) {
-      var r = w.getBoundingClientRect(); if (r.bottom < -400 || r.top > vh + 400) return;
+      var r = rect(w); if (r.bottom < -400 || r.top > vh + 400) return;
       var s = parseFloat(w.getAttribute('data-speed')), d = r.top + r.height / 2 - vh / 2;
       var isCollage = w.classList.contains('c-photo'), img = w.firstElementChild;
       // collage photos float up faster than the page, each at its own speed; the others drift gently
-      w.style.translate = '0 ' + (isCollage ? d * s : -d * s * 0.4) + 'px';
-      if (img) { var lim = r.height * 0.1; img.style.transform = 'translate3d(0,' + clamp(isCollage ? -d * s * 0.12 : d * s * 0.3, -lim, lim) + 'px,0)'; }
+      put(w, 'translate', '0 ' + (isCollage ? d * s : -d * s * 0.4).toFixed(1) + 'px');
+      if (img) { var lim = r.height * 0.1; put(img, 'transform', 'translate3d(0,' + clamp(isCollage ? -d * s * 0.12 : d * s * 0.3, -lim, lim).toFixed(1) + 'px,0)'); }
     });
-    pxImgs.forEach(function (im) {
-      var sec = im.closest('section'), r = sec.getBoundingClientRect(); if (r.bottom < 0 || r.top > vh) return;
-      im.style.transform = 'translate3d(0,' + ((r.top + r.height / 2 - vh / 2) * -0.12) + 'px,0)';
+    pxImgs.forEach(function (im, k) {
+      var r = rect(pxSecs[k]); if (r.bottom < 0 || r.top > vh) return;
+      put(im, 'transform', 'translate3d(0,' + ((r.top + r.height / 2 - vh / 2) * -0.12).toFixed(1) + 'px,0)');
     });
     // scrubbed statement
     if (scrub) {
-      var r = scrub.getBoundingClientRect(), p = clamp((vh * 0.85 - r.top) / (vh * 0.55 + r.height * 0.4), 0, 1), n = scrubWords.length;
-      scrubWords.forEach(function (w, i) { var wp = clamp(p * (n + 6) - i, 0, 6) / 6; w.style.color = lerpC(wp); });
+      var sr0 = rect(scrub), p0 = clamp((vh * 0.85 - sr0.top) / (vh * 0.55 + sr0.height * 0.4), 0, 1), n = scrubWords.length;
+      scrubWords.forEach(function (w, i) { var wp = clamp(p0 * (n + 6) - i, 0, 6) / 6; put(w, 'color', lerpC(wp)); });
     }
     // giant labels slide in from the right: translate3d((1-t)*720px), opacity .15 -> 1
     ghosts.forEach(function (g) {
-      var top = g.getBoundingClientRect().top, t = easeOutCubic(clamp((0.92 * vh - top) / (0.62 * vh), 0, 1));
-      g.style.transform = 'translate3d(' + ((1 - t) * 720) + 'px,0,0)'; g.style.opacity = 0.15 + 0.85 * t;
+      var top = rect(g).top, t = easeOutCubic(clamp((0.92 * vh - top) / (0.62 * vh), 0, 1));
+      put(g, 'transform', 'translate3d(' + ((1 - t) * 720).toFixed(1) + 'px,0,0)'); put(g, 'opacity', (0.15 + 0.85 * t).toFixed(3));
     });
     // scroll-driven cards: process steps stack up one by one, "included" cards rise left to right with a slight scale
-    steps.forEach(function (s) {
-      var top = s.getBoundingClientRect().top;
+    steps.forEach(function (s, k) {
+      var top = rect(s).top;
       if (s.getAttribute('data-step') === 'card') {
-        var i = parseFloat(s.style.getPropertyValue('--i')) || 0, sec = s.closest('section'), sr = sec.getBoundingClientRect();
+        var i = parseFloat(s.style.getPropertyValue('--i')) || 0, sr = rect(stepSecs[k]);
         var span = sr.height - vh, p = span > 40 ? clamp(-sr.top / span, 0, 1) : 1;
         // card i owns its own piece of the pinned scroll: [0.03 + i*0.2, +0.22]
         var t = span > 40 ? easeOutCubic(clamp((p - (0.03 + i * 0.2)) / 0.22, 0, 1)) : 1;
-        s.style.transform = 'translate3d(0,' + ((1 - t) * 120) + 'px,0) scale(' + (0.96 + 0.04 * t) + ')'; s.style.opacity = t;
+        put(s, 'transform', 'translate3d(0,' + ((1 - t) * 120).toFixed(1) + 'px,0) scale(' + (0.96 + 0.04 * t).toFixed(4) + ')'); put(s, 'opacity', t.toFixed(3));
       } else {
         var t2 = easeOutCubic(clamp((0.95 * vh - top) / (0.3 * vh), 0, 1));
-        s.style.transform = 'translate3d(0,' + ((1 - t2) * 60) + 'px,0)'; s.style.opacity = t2;
+        put(s, 'transform', 'translate3d(0,' + ((1 - t2) * 60).toFixed(1) + 'px,0)'); put(s, 'opacity', t2.toFixed(3));
       }
     });
     // scrubbed reveals: card = lift + scale, row = wipe from the left, media = lift + photo unmasked from the bottom; siblings enter one after another
     scrubs.forEach(function (el) {
-      var kind = el.getAttribute('data-scrub'), r = el.getBoundingClientRect(), top = r.top - el._ty;
-      var t = reduce ? 1 : easeOutCubic(clamp((vh * 0.97 - el._i * vh * 0.05 - top) / (vh * 0.3), 0, 1)), ty = 0, st = el.style;
-      if (kind === 'row') { ty = 0; st.clipPath = t >= 1 ? '' : 'inset(0 ' + ((1 - t) * 100) + '% 0 0)'; st.transform = t >= 1 ? '' : 'translate3d(' + ((1 - t) * -2) + 'rem,0,0)'; }
-      else { ty = (1 - t) * (kind === 'card' ? 80 : 56); st.transform = t >= 1 ? '' : 'translate3d(0,' + ty + 'px,0)' + (kind === 'card' ? ' scale(' + (0.92 + 0.08 * t) + ')' : ''); }
+      var kind = el.getAttribute('data-scrub'), top = rect(el).top - el._ty;
+      var t = reduce ? 1 : Math.round(easeOutCubic(clamp((vh * 0.97 - el._i * vh * 0.05 - top) / (vh * 0.3), 0, 1)) * 1000) / 1000, ty = 0, st = el.style;
+      if (t === el._t) return; el._t = t;
+      if (kind === 'row') { st.clipPath = t >= 1 ? '' : 'inset(0 ' + ((1 - t) * 100).toFixed(2) + '% 0 0)'; st.transform = t >= 1 ? '' : 'translate3d(' + ((1 - t) * -2).toFixed(3) + 'rem,0,0)'; }
+      else { ty = (1 - t) * (kind === 'card' ? 80 : 56); st.transform = t >= 1 ? '' : 'translate3d(0,' + ty.toFixed(1) + 'px,0)' + (kind === 'card' ? ' scale(' + (0.92 + 0.08 * t).toFixed(4) + ')' : ''); }
       st.opacity = kind === 'row' ? 1 : Math.min(1, t * 1.6);
-      if (el._win) { var pt = easeOutCubic(clamp((t - 0.15) / 0.85, 0, 1)); el._win.style.clipPath = pt >= 1 ? '' : 'inset(' + ((1 - pt) * 100) + '% 0 0 0)'; var im = el._win.firstElementChild; if (im) im.style.scale = 1 + 0.25 * (1 - pt); }
+      if (el._win) { var pt = easeOutCubic(clamp((t - 0.15) / 0.85, 0, 1)); el._win.style.clipPath = pt >= 1 ? '' : 'inset(' + ((1 - pt) * 100).toFixed(2) + '% 0 0 0)'; var im = el._win.firstElementChild; if (im) im.style.scale = (1 + 0.25 * (1 - pt)).toFixed(4); }
       el._ty = ty;
     });
-    if (ring) ring.style.transform = 'rotate(' + (scroll * 0.25) + 'deg)';
+    if (ring) put(ring, 'transform', 'rotate(' + (scroll * 0.25).toFixed(1) + 'deg)');
     updateRally(scroll);
     // header stays pinned; it turns light once the hero is behind it
     var light = scroll > heroH - 70;
