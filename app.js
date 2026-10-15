@@ -145,7 +145,7 @@
         var p0 = pts[q2 - 1], p1 = q2 <= lo ? pts[q2] : [bx, by], cEnd = q2 <= lo ? R.cum[q2] : len, fr = clamp((cEnd - (len - TL)) / TL, 0, 1);
         if (fr <= 0) continue;
         c.beginPath(); c.moveTo(p0[0], p0[1] + off); c.lineTo(p1[0], p1[1] + off);
-        c.lineWidth = 0.5 + 2.4 * fr; c.strokeStyle = 'rgba(168,235,51,' + (0.9 * fr * fr).toFixed(3) + ')'; c.stroke();
+        c.lineWidth = 0.5 + 2.4 * fr; c.strokeStyle = 'rgba(23,23,23,' + (0.26 * fr * fr).toFixed(3) + ')'; c.stroke();
       }
     }
     // bounce rings: hairline outer ring, lime inner ring, centre dot and a ripple that spreads and fades after the hit
@@ -155,17 +155,17 @@
       var age = len - R.cum[R.bIdx[k]] + 6, g = easeOutCubic(clamp(age / 260, 0, 1)); if (g <= 0) continue;
       var sc = 0.2 + 0.8 * g;
       c.strokeStyle = 'rgba(23,23,23,' + (0.11 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 84 * sc, 22 * sc, 0, 0, 6.2832); c.stroke();
-      c.strokeStyle = 'rgba(168,235,51,' + (0.9 * g).toFixed(3) + ')'; c.lineWidth = 1.25; c.beginPath(); c.ellipse(q[0], y, 44 * sc, 12 * sc, 0, 0, 6.2832); c.stroke(); c.lineWidth = 1;
-      c.fillStyle = 'rgba(168,235,51,' + (0.95 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 3.5, 0, 6.2832); c.fill();
+      c.strokeStyle = 'rgba(23,23,23,' + (0.36 * g).toFixed(3) + ')'; c.lineWidth = 1.25; c.beginPath(); c.ellipse(q[0], y, 44 * sc, 12 * sc, 0, 0, 6.2832); c.stroke(); c.lineWidth = 1;
+      c.fillStyle = 'rgba(23,23,23,' + (0.34 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 3.5, 0, 6.2832); c.fill();
       var rp = clamp(age / 520, 0, 1);
-      if (rp > 0 && rp < 1) { var re = easeOutCubic(rp), rr = 24 + 210 * re; c.strokeStyle = 'rgba(168,235,51,' + (0.32 * (1 - rp) * (1 - rp)).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, rr, rr * 0.26, 0, 0, 6.2832); c.stroke(); }
+      if (rp > 0 && rp < 1) { var re = easeOutCubic(rp), rr = 24 + 210 * re; c.strokeStyle = 'rgba(23,23,23,' + (0.14 * (1 - rp) * (1 - rp)).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, rr, rr * 0.26, 0, 0, 6.2832); c.stroke(); }
     }
     // the ball: translucent lime core with a soft halo
     var bY = by + off;
     if (bY > -40 && bY < vh + 40) {
-      var gr = c.createRadialGradient(bx, bY, 0, bx, bY, 48); gr.addColorStop(0, 'rgba(168,235,51,.20)'); gr.addColorStop(1, 'rgba(168,235,51,0)');
+      var gr = c.createRadialGradient(bx, bY, 0, bx, bY, 48); gr.addColorStop(0, 'rgba(23,23,23,.07)'); gr.addColorStop(1, 'rgba(23,23,23,0)');
       c.fillStyle = gr; c.beginPath(); c.arc(bx, bY, 48, 0, 6.2832); c.fill();
-      c.fillStyle = 'rgba(168,235,51,.38)'; c.beginPath(); c.arc(bx, bY, 17, 0, 6.2832); c.fill();
+      c.fillStyle = 'rgba(23,23,23,.16)'; c.beginPath(); c.arc(bx, bY, 17, 0, 6.2832); c.fill();
     }
   }
 
