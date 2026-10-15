@@ -156,6 +156,13 @@
       var sc = 0.2 + 0.8 * g;
       c.strokeStyle = 'rgba(23,23,23,' + (0.16 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 84 * sc, 22 * sc, 0, 0, 6.2832); c.stroke();
       c.fillStyle = 'rgba(23,23,23,' + (0.26 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 3, 0, 6.2832); c.fill();
+      // two faint waves spread out from the impact point and fade away
+      var rp = clamp(age / 420, 0, 1);
+      if (rp > 0 && rp < 1) for (var wv = 0; wv < 2; wv++) {
+        var rq = clamp(rp * 1.3 - wv * 0.24, 0, 1); if (rq <= 0 || rq >= 1) continue;
+        var rr = 12 + 130 * easeOutCubic(rq);
+        c.strokeStyle = 'rgba(23,23,23,' + (0.3 * (1 - rq) * (1 - rq)).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, rr, rr * 0.26, 0, 0, 6.2832); c.stroke();
+      }
     }
     // the ball: plain, translucent graphite
     var bY = by + off, hh = a0[2] + (b0[2] - a0[2]) * f;
