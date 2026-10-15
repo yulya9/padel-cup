@@ -149,7 +149,7 @@
       c.strokeStyle = 'rgba(23,23,23,' + (0.16 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 44 * (0.2 + 0.8 * g), 12 * (0.2 + 0.8 * g), 0, 0, 6.2832); c.stroke();
       c.fillStyle = 'rgba(23,23,23,' + (0.18 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 5, 0, 6.2832); c.fill();
     }
-    if (by + off > -20 && by + off < vh + 20) { c.fillStyle = 'rgba(201,201,201,.6)'; c.beginPath(); c.arc(bx, by + off, 12, 0, 6.2832); c.fill(); }
+    if (by + off > -20 && by + off < vh + 20) { c.fillStyle = 'rgba(168,235,51,.6)'; c.beginPath(); c.arc(bx, by + off, 12, 0, 6.2832); c.fill(); }
   }
 
   /* ---------- per-frame scroll effects ---------- */
