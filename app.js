@@ -161,7 +161,8 @@
       if (rp > 0 && rp < 1) for (var wv = 0; wv < 2; wv++) {
         var rq = clamp(rp * 1.3 - wv * 0.24, 0, 1); if (rq <= 0 || rq >= 1) continue;
         var rr = 12 + 130 * easeOutCubic(rq);
-        c.strokeStyle = 'rgba(23,23,23,' + (0.3 * (1 - rq) * (1 - rq)).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, rr, rr * 0.26, 0, 0, 6.2832); c.stroke();
+        c.setLineDash([1, 8]); c.lineCap = 'round'; c.lineWidth = 1.3;
+        c.strokeStyle = 'rgba(23,23,23,' + (0.17 * (1 - rq) * (1 - rq)).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, rr, rr * 0.26, 0, 0, 6.2832); c.stroke(); c.setLineDash([]); c.lineWidth = 1;
       }
     }
     // the ball: plain, translucent graphite
