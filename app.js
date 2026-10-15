@@ -170,7 +170,7 @@
     if (bY > -60 && bY < vh + 120) {
       // the ball hops above a floor line: a soft shadow stays on the floor, smaller and fainter the higher the ball is
       var lift = clamp(hh / 240, 0, 1), sw = 22 * (1 - 0.35 * lift);
-      c.fillStyle = 'rgba(23,23,23,' + (0.035 * (1 - 0.65 * lift)).toFixed(3) + ')'; c.beginPath(); c.ellipse(bx, bY + hh * 0.7, sw, sw * 0.32, 0, 0, 6.2832); c.fill();
+      c.fillStyle = 'rgba(23,23,23,' + (0.055 * (1 - 0.65 * lift)).toFixed(3) + ')'; c.beginPath(); c.ellipse(bx, bY + hh * 0.7, sw, sw * 0.32, 0, 0, 6.2832); c.fill();
       // on touch-down it flattens a little
       var sq = clamp(1 - hh / 16, 0, 1), rx = 15 * (1 + 0.2 * sq), ry = 15 * (1 - 0.24 * sq);
       c.fillStyle = 'rgba(23,23,23,.16)'; c.beginPath(); c.ellipse(bx, bY + (15 - ry) * 0.6, rx, ry, 0, 0, 6.2832); c.fill();
