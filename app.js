@@ -133,7 +133,7 @@
     var bx = a0[0] + (b0[0] - a0[0]) * f, by = a0[1] + (b0[1] - a0[1]) * f, len = R.cum[lo] + (R.cum[hi] - R.cum[lo]) * f;
     c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0); c.clearRect(0, 0, R.W, vh);
     var vmin = -off - 60, vmax = -off + vh + 60;
-    // trail: a fine dotted line up to the ball, with a short tapered lime comet tail right behind it
+    // trail: a fine dotted line up to the ball, with a barely visible tapered tail behind it
     var s = 0, h2 = lo; while (h2 - s > 1) { var m2 = (s + h2) >> 1; if (pts[m2][1] < vmin) s = m2; else h2 = m2; }
     if (by > vmin) {
       c.beginPath(); c.moveTo(pts[s][0], pts[s][1] + off);
@@ -145,28 +145,21 @@
         var p0 = pts[q2 - 1], p1 = q2 <= lo ? pts[q2] : [bx, by], cEnd = q2 <= lo ? R.cum[q2] : len, fr = clamp((cEnd - (len - TL)) / TL, 0, 1);
         if (fr <= 0) continue;
         c.beginPath(); c.moveTo(p0[0], p0[1] + off); c.lineTo(p1[0], p1[1] + off);
-        c.lineWidth = 0.5 + 2.4 * fr; c.strokeStyle = 'rgba(23,23,23,' + (0.26 * fr * fr).toFixed(3) + ')'; c.stroke();
+        c.lineWidth = 0.5 + 1 * fr; c.strokeStyle = 'rgba(23,23,23,' + (0.1 * fr * fr).toFixed(3) + ')'; c.stroke();
       }
     }
-    // bounce rings: hairline outer ring, lime inner ring, centre dot and a ripple that spreads and fades after the hit
+    // bounce: one hairline ring and a centre dot that grow in once the ball has passed
     c.lineWidth = 1;
     for (var k = 0; k < R.bIdx.length; k++) {
       var q = pts[R.bIdx[k]], y = q[1] + off; if (q[1] < vmin - 120 || q[1] > vmax + 120) continue;
       var age = len - R.cum[R.bIdx[k]] + 6, g = easeOutCubic(clamp(age / 260, 0, 1)); if (g <= 0) continue;
       var sc = 0.2 + 0.8 * g;
-      c.strokeStyle = 'rgba(23,23,23,' + (0.11 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 84 * sc, 22 * sc, 0, 0, 6.2832); c.stroke();
-      c.strokeStyle = 'rgba(23,23,23,' + (0.36 * g).toFixed(3) + ')'; c.lineWidth = 1.25; c.beginPath(); c.ellipse(q[0], y, 44 * sc, 12 * sc, 0, 0, 6.2832); c.stroke(); c.lineWidth = 1;
-      c.fillStyle = 'rgba(23,23,23,' + (0.34 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 3.5, 0, 6.2832); c.fill();
-      var rp = clamp(age / 520, 0, 1);
-      if (rp > 0 && rp < 1) { var re = easeOutCubic(rp), rr = 24 + 210 * re; c.strokeStyle = 'rgba(23,23,23,' + (0.14 * (1 - rp) * (1 - rp)).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, rr, rr * 0.26, 0, 0, 6.2832); c.stroke(); }
+      c.strokeStyle = 'rgba(23,23,23,' + (0.16 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 84 * sc, 22 * sc, 0, 0, 6.2832); c.stroke();
+      c.fillStyle = 'rgba(23,23,23,' + (0.26 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 3, 0, 6.2832); c.fill();
     }
-    // the ball: translucent lime core with a soft halo
+    // the ball: plain, translucent graphite
     var bY = by + off;
-    if (bY > -40 && bY < vh + 40) {
-      var gr = c.createRadialGradient(bx, bY, 0, bx, bY, 48); gr.addColorStop(0, 'rgba(23,23,23,.07)'); gr.addColorStop(1, 'rgba(23,23,23,0)');
-      c.fillStyle = gr; c.beginPath(); c.arc(bx, bY, 48, 0, 6.2832); c.fill();
-      c.fillStyle = 'rgba(23,23,23,.16)'; c.beginPath(); c.arc(bx, bY, 17, 0, 6.2832); c.fill();
-    }
+    if (bY > -40 && bY < vh + 40) { c.fillStyle = 'rgba(23,23,23,.16)'; c.beginPath(); c.arc(bx, bY, 15, 0, 6.2832); c.fill(); }
   }
 
   /* ---------- per-frame scroll effects ---------- */
@@ -224,10 +217,10 @@
         var span = sr.height - vh, p = span > 40 ? clamp(-sr.top / span, 0, 1) : 1;
         // card i owns its own piece of the pinned scroll: [0.03 + i*0.2, +0.22]
         var t = span > 40 ? easeOutCubic(clamp((p - (0.03 + i * 0.2)) / 0.22, 0, 1)) : 1;
-        put(s, 'transform', 'translate3d(0,' + ((1 - t) * 120).toFixed(1) + 'px,0) scale(' + (0.96 + 0.04 * t).toFixed(4) + ')'); put(s, 'opacity', t.toFixed(3));
+        put(s, 'transform', 'translate3d(0,' + ((1 - t) * 40).toFixed(1) + 'px,0) scale(' + (0.98 + 0.02 * t).toFixed(4) + ')'); put(s, 'opacity', t.toFixed(3));
       } else {
         var t2 = easeOutCubic(clamp((0.95 * vh - top) / (0.3 * vh), 0, 1));
-        put(s, 'transform', 'translate3d(0,' + ((1 - t2) * 60).toFixed(1) + 'px,0)'); put(s, 'opacity', t2.toFixed(3));
+        put(s, 'transform', 'translate3d(0,' + ((1 - t2) * 28).toFixed(1) + 'px,0)'); put(s, 'opacity', t2.toFixed(3));
       }
     });
     // scrubbed reveals: card = lift + scale, row = wipe from the left, media = lift + photo unmasked from the bottom; siblings enter one after another
@@ -235,8 +228,8 @@
       var kind = el.getAttribute('data-scrub'), top = rect(el).top - el._ty;
       var t = reduce ? 1 : Math.round(easeOutCubic(clamp((vh * 0.97 - el._i * vh * 0.05 - top) / (vh * 0.3), 0, 1)) * 1000) / 1000, ty = 0, st = el.style;
       if (t === el._t) return; el._t = t;
-      if (kind === 'row') { st.clipPath = t >= 1 ? '' : 'inset(0 ' + ((1 - t) * 100).toFixed(2) + '% 0 0)'; st.transform = t >= 1 ? '' : 'translate3d(' + ((1 - t) * -2).toFixed(3) + 'rem,0,0)'; }
-      else { ty = (1 - t) * (kind === 'card' ? 80 : 56); st.transform = t >= 1 ? '' : 'translate3d(0,' + ty.toFixed(1) + 'px,0)' + (kind === 'card' ? ' scale(' + (0.92 + 0.08 * t).toFixed(4) + ')' : ''); }
+      if (kind === 'row') { st.clipPath = t >= 1 ? '' : 'inset(0 ' + ((1 - t) * 100).toFixed(2) + '% 0 0)'; st.transform = t >= 1 ? '' : 'translate3d(' + ((1 - t) * -1).toFixed(3) + 'rem,0,0)'; }
+      else { ty = (1 - t) * 28; st.transform = t >= 1 ? '' : 'translate3d(0,' + ty.toFixed(1) + 'px,0)' + (kind === 'card' ? ' scale(' + (0.98 + 0.02 * t).toFixed(4) + ')' : ''); }
       st.opacity = kind === 'row' ? 1 : Math.min(1, t * 1.6);
       if (el._win) { var pt = easeOutCubic(clamp((t - 0.15) / 0.85, 0, 1)); el._win.style.clipPath = pt >= 1 ? '' : 'inset(' + ((1 - pt) * 100).toFixed(2) + '% 0 0 0)'; var im = el._win.firstElementChild; if (im) im.style.scale = (1 + 0.25 * (1 - pt)).toFixed(4); }
       el._ty = ty;
