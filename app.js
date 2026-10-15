@@ -106,13 +106,13 @@
     var ease = { io: function (t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }, out: function (t) { return 1 - (1 - t) * (1 - t); }, 'in': function (t) { return t * t; }, lin: function (t) { return t; } };
     var wts = [1, .85, 1.2, .9, 1.1, .8, 1.05, .9, 1.15], wsum = 0, i0;
     for (i0 = 0; i0 < n; i0++) wsum += wts[i0 % wts.length];
-    var x = W * 0.92, y = 0, dir = -1, pts = [[x, 0]], cum = [0], bIdx = [], N = 48, total = 0;
+    var x = W * 0.92, y = 0, dir = -1, pts = [[x, 0, 0]], cum = [0], bIdx = [], N = 48, total = 0;
     for (var k = 0; k < n; k++) {
       var p = pat[k % pat.length], hop = p.hop * (narrow ? 0.55 : 1), step = H * 0.97 * wts[k % wts.length] / wsum;
       var nx = dir < 0 ? W * p.ins : W - W * p.ins;
       for (var j = 1; j <= N; j++) {
         var t = j / N, px = x + (nx - x) * ease[p.e](t), py = y + step * t - hop * Math.sin(Math.PI * t), last = pts[pts.length - 1];
-        total += Math.sqrt((px - last[0]) * (px - last[0]) + (py - last[1]) * (py - last[1])); pts.push([px, py]); cum.push(total);
+        total += Math.sqrt((px - last[0]) * (px - last[0]) + (py - last[1]) * (py - last[1])); pts.push([px, py, hop * Math.sin(Math.PI * t)]); cum.push(total);
       }
       bIdx.push(pts.length - 1); x = nx; y += step; dir *= -1;
     }
@@ -158,8 +158,15 @@
       c.fillStyle = 'rgba(23,23,23,' + (0.26 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 3, 0, 6.2832); c.fill();
     }
     // the ball: plain, translucent graphite
-    var bY = by + off;
-    if (bY > -40 && bY < vh + 40) { c.fillStyle = 'rgba(23,23,23,.16)'; c.beginPath(); c.arc(bx, bY, 15, 0, 6.2832); c.fill(); }
+    var bY = by + off, hh = a0[2] + (b0[2] - a0[2]) * f;
+    if (bY > -60 && bY < vh + 120) {
+      // the ball hops above a floor line: a soft shadow stays on the floor, smaller and fainter the higher the ball is
+      var lift = clamp(hh / 240, 0, 1), sw = 22 * (1 - 0.35 * lift);
+      c.fillStyle = 'rgba(23,23,23,' + (0.1 * (1 - 0.65 * lift)).toFixed(3) + ')'; c.beginPath(); c.ellipse(bx, bY + hh * 0.7, sw, sw * 0.32, 0, 0, 6.2832); c.fill();
+      // on touch-down it flattens a little
+      var sq = clamp(1 - hh / 16, 0, 1), rx = 15 * (1 + 0.2 * sq), ry = 15 * (1 - 0.24 * sq);
+      c.fillStyle = 'rgba(23,23,23,.16)'; c.beginPath(); c.ellipse(bx, bY + (15 - ry) * 0.6, rx, ry, 0, 0, 6.2832); c.fill();
+    }
   }
 
   /* ---------- per-frame scroll effects ---------- */
@@ -176,8 +183,10 @@
   // geometry is read once per frame before any write, and a style is only written when its value changed (cheap in Safari)
   function rect(el) { if (el._f !== frame) { el._r = el.getBoundingClientRect(); el._f = frame; } return el._r; }
   function put(el, prop, v) { var k = '_p' + prop; if (el[k] !== v) { el[k] = v; el.style[prop] = v; } }
+  var skew = 0;
   function update(scroll) {
     frame++;
+    skew += ((lenis ? clamp(lenis.velocity * 0.05, -2, 2) : 0) - skew) * 0.1;
     wins.forEach(rect); steps.forEach(rect); scrubs.forEach(rect); ghosts.forEach(rect); pxSecs.forEach(rect);
     stepSecs.forEach(function (s) { if (s) rect(s); });
     if (scrub) rect(scrub);
@@ -193,7 +202,7 @@
       var isCollage = w.classList.contains('c-photo'), img = w.firstElementChild;
       // collage photos float up faster than the page, each at its own speed; the others drift gently
       put(w, 'translate', '0 ' + (isCollage ? d * s : -d * s * 0.4).toFixed(1) + 'px');
-      if (img) { var lim = r.height * 0.1; put(img, 'transform', 'translate3d(0,' + clamp(isCollage ? -d * s * 0.12 : d * s * 0.3, -lim, lim).toFixed(1) + 'px,0)'); }
+      if (img) { var lim = r.height * 0.1; put(img, 'transform', 'translate3d(0,' + clamp(isCollage ? -d * s * 0.12 : d * s * 0.3, -lim, lim).toFixed(1) + 'px,0)' + (isCollage ? ' skewY(' + skew.toFixed(2) + 'deg)' : '')); }
     });
     if (!lite) pxImgs.forEach(function (im, k) {
       var r = rect(pxSecs[k]); if (r.bottom < 0 || r.top > vh) return;
