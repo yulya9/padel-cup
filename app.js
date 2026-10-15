@@ -133,23 +133,40 @@
     var bx = a0[0] + (b0[0] - a0[0]) * f, by = a0[1] + (b0[1] - a0[1]) * f, len = R.cum[lo] + (R.cum[hi] - R.cum[lo]) * f;
     c.setTransform(R.dpr, 0, 0, R.dpr, 0, 0); c.clearRect(0, 0, R.W, vh);
     var vmin = -off - 60, vmax = -off + vh + 60;
-    // trail: from the first visible point up to the ball
+    // trail: a fine dotted line up to the ball, with a short tapered lime comet tail right behind it
     var s = 0, h2 = lo; while (h2 - s > 1) { var m2 = (s + h2) >> 1; if (pts[m2][1] < vmin) s = m2; else h2 = m2; }
     if (by > vmin) {
       c.beginPath(); c.moveTo(pts[s][0], pts[s][1] + off);
       for (var i = s + 1; i <= lo; i++) { if (pts[i][1] > vmax) break; c.lineTo(pts[i][0], pts[i][1] + off); }
       if (by <= vmax) c.lineTo(bx, by + off);
-      c.setLineDash([2, 10]); c.lineDashOffset = -R.cum[s]; c.lineCap = 'round'; c.lineWidth = 1.5; c.strokeStyle = 'rgba(23,23,23,.16)'; c.stroke(); c.setLineDash([]);
+      c.setLineDash([1, 9]); c.lineDashOffset = -R.cum[s]; c.lineCap = 'round'; c.lineJoin = 'round'; c.lineWidth = 1.4; c.strokeStyle = 'rgba(23,23,23,.22)'; c.stroke(); c.setLineDash([]);
+      var TL = 340, ts = lo; while (ts > s && R.cum[ts] > len - TL) ts--;
+      for (var q2 = ts + 1; q2 <= lo + 1; q2++) {
+        var p0 = pts[q2 - 1], p1 = q2 <= lo ? pts[q2] : [bx, by], cEnd = q2 <= lo ? R.cum[q2] : len, fr = clamp((cEnd - (len - TL)) / TL, 0, 1);
+        if (fr <= 0) continue;
+        c.beginPath(); c.moveTo(p0[0], p0[1] + off); c.lineTo(p1[0], p1[1] + off);
+        c.lineWidth = 0.5 + 2.4 * fr; c.strokeStyle = 'rgba(168,235,51,' + (0.9 * fr * fr).toFixed(3) + ')'; c.stroke();
+      }
     }
-    // bounce rings grow in once the ball has passed the point
+    // bounce rings: hairline outer ring, lime inner ring, centre dot and a ripple that spreads and fades after the hit
+    c.lineWidth = 1;
     for (var k = 0; k < R.bIdx.length; k++) {
-      var q = pts[R.bIdx[k]], y = q[1] + off; if (q[1] < vmin - 40 || q[1] > vmax + 40) continue;
-      var g = easeOutCubic(clamp((len - R.cum[R.bIdx[k]] + 6) / 260, 0, 1)); if (g <= 0) continue;
-      c.lineWidth = 1.5; c.strokeStyle = 'rgba(23,23,23,' + (0.08 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 84 * (0.2 + 0.8 * g), 22 * (0.2 + 0.8 * g), 0, 0, 6.2832); c.stroke();
-      c.strokeStyle = 'rgba(23,23,23,' + (0.16 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 44 * (0.2 + 0.8 * g), 12 * (0.2 + 0.8 * g), 0, 0, 6.2832); c.stroke();
-      c.fillStyle = 'rgba(23,23,23,' + (0.18 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 5, 0, 6.2832); c.fill();
+      var q = pts[R.bIdx[k]], y = q[1] + off; if (q[1] < vmin - 120 || q[1] > vmax + 120) continue;
+      var age = len - R.cum[R.bIdx[k]] + 6, g = easeOutCubic(clamp(age / 260, 0, 1)); if (g <= 0) continue;
+      var sc = 0.2 + 0.8 * g;
+      c.strokeStyle = 'rgba(23,23,23,' + (0.11 * g).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, 84 * sc, 22 * sc, 0, 0, 6.2832); c.stroke();
+      c.strokeStyle = 'rgba(168,235,51,' + (0.9 * g).toFixed(3) + ')'; c.lineWidth = 1.25; c.beginPath(); c.ellipse(q[0], y, 44 * sc, 12 * sc, 0, 0, 6.2832); c.stroke(); c.lineWidth = 1;
+      c.fillStyle = 'rgba(168,235,51,' + (0.95 * g).toFixed(3) + ')'; c.beginPath(); c.arc(q[0], y, 3.5, 0, 6.2832); c.fill();
+      var rp = clamp(age / 520, 0, 1);
+      if (rp > 0 && rp < 1) { var re = easeOutCubic(rp), rr = 24 + 210 * re; c.strokeStyle = 'rgba(168,235,51,' + (0.32 * (1 - rp) * (1 - rp)).toFixed(3) + ')'; c.beginPath(); c.ellipse(q[0], y, rr, rr * 0.26, 0, 0, 6.2832); c.stroke(); }
     }
-    if (by + off > -20 && by + off < vh + 20) { c.fillStyle = 'rgba(168,235,51,.6)'; c.beginPath(); c.arc(bx, by + off, 12, 0, 6.2832); c.fill(); }
+    // the ball: translucent lime core with a soft halo
+    var bY = by + off;
+    if (bY > -40 && bY < vh + 40) {
+      var gr = c.createRadialGradient(bx, bY, 0, bx, bY, 48); gr.addColorStop(0, 'rgba(168,235,51,.20)'); gr.addColorStop(1, 'rgba(168,235,51,0)');
+      c.fillStyle = gr; c.beginPath(); c.arc(bx, bY, 48, 0, 6.2832); c.fill();
+      c.fillStyle = 'rgba(168,235,51,.38)'; c.beginPath(); c.arc(bx, bY, 17, 0, 6.2832); c.fill();
+    }
   }
 
   /* ---------- per-frame scroll effects ---------- */
